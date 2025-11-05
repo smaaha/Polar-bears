@@ -151,15 +151,15 @@
                         <td class="visible-with-data" id="nimi">' + (feature.properties['nimi'] !== null ? autolinker.link(String(feature.properties['nimi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">ko_perus</th>\
+                        <th scope="row">Basic education only</th>\
                         <td>' + (feature.properties['ko_perus'] !== null ? autolinker.link(String(feature.properties['ko_perus']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">hr_mtu</th>\
+                        <th scope="row">Median income</th>\
                         <td>' + (feature.properties['hr_mtu'] !== null ? autolinker.link(String(feature.properties['hr_mtu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Emplyotyme</th>\
+                        <th scope="row">Unemployment rate (%)</th>\
                         <td class="visible-with-data" id="Emplyotyme">' + (feature.properties['Emplyotyme'] !== null ? autolinker.link(String(feature.properties['Emplyotyme']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
