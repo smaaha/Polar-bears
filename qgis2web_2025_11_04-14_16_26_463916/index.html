@@ -93,7 +93,18 @@
             return this._div;
         };
         title.update = function () {
-            this._div.innerHTML = '<h2>Turku tramline impact on service accessibility </h2>';
+           // Add a white box with text after the heading
+            this._div.innerHTML = `
+				<div style="
+					background-color: rgba(255,255,255,0.9);
+					padding: 10px 15px;
+					border-radius: 10px;
+					max-width: 350px;
+					line-height: 1.4;
+				">
+				<h2>Turku tramline impact on service accessibility </h2><p>This map shows how the planned tram line influences accessibility to wellbeing services across different socio-economic areas in Turku.</p>
+				</div>
+			`;
         };
         title.addTo(map);
         var abstract = new L.Control({'position':'bottomleft'});
@@ -108,8 +119,17 @@
             abstract.show = function () {
                 this._div.classList.remove("abstract");
                 this._div.classList.add("abstractUncollapsed");
-                this._div.innerHTML = '??';
-        };
+				// Add map instructions box
+				this._div.innerHTML = `
+					<div class="map-instructions-box">
+						<h3>Instructions</h3>
+						<p>
+							KESKEN / Here you can write short guidance for the user — for example:
+							how to zoom in/out, how to toggle layers, or how to interpret colors and symbols on the map.
+						</p>
+					</div>
+				`;
+			};
         abstract.addTo(map);
 		
         var zoomControl = L.control.zoom({
@@ -307,7 +327,7 @@
             }
         }
         map.createPane('pane_Buffers_2');
-        map.getPane('pane_Buffers_2').style.zIndex = 402;
+        map.getPane('pane_Buffers_2').style.zIndex = 405;
         map.getPane('pane_Buffers_2').style['mix-blend-mode'] = 'normal';
         var layer_Buffers_2 = new L.geoJson(json_Buffers_2, {
 		    style: { color: '#ff0000', fillOpacity: 0.2, weight: 2 },
@@ -362,7 +382,7 @@
             }
         }
         map.createPane('pane_Tramline_3');
-        map.getPane('pane_Tramline_3').style.zIndex = 403;
+        map.getPane('pane_Tramline_3').style.zIndex = 406;
         map.getPane('pane_Tramline_3').style['mix-blend-mode'] = 'normal';
         var layer_Tramline_3 = new L.geoJson(json_Tramline_3, {
             attribution: '',
@@ -429,7 +449,7 @@
             }
         }
         map.createPane('pane_Tramstops_4');
-        map.getPane('pane_Tramstops_4').style.zIndex = 404;
+        map.getPane('pane_Tramstops_4').style.zIndex = 407;
         map.getPane('pane_Tramstops_4').style['mix-blend-mode'] = 'normal';
         var layer_Tramstops_4 = new L.geoJson(json_Tramstops_4, {
             attribution: '',
@@ -557,7 +577,7 @@
 		bounds_group.addLayer(layer_Wellbeingservicesmerged_5); 
 		map.removeLayer(layer_Wellbeingservicesmerged_5); 
         map.createPane('pane_Culture_heatmap_6');
-        map.getPane('pane_Culture_heatmap_6').style.zIndex = 406;
+        map.getPane('pane_Culture_heatmap_6').style.zIndex = 402;
 		var serviceLegend = L.control({ position: 'bottomright' });
 
 		serviceLegend.onAdd = function (map) {
@@ -589,7 +609,7 @@
         bounds_group.addLayer(layer_Culture_heatmap_6);
         map.addLayer(layer_Culture_heatmap_6);
         map.createPane('pane_Sport_heatmap_7');
-        map.getPane('pane_Sport_heatmap_7').style.zIndex = 407;
+        map.getPane('pane_Sport_heatmap_7').style.zIndex = 403;
         var img_Sport_heatmap_7 = 'data/Sport_heatmap_7.png';
         var img_bounds_Sport_heatmap_7 = [[60.38274903992388,22.07849305479689],[60.500974814231526,22.4333581376815]];
         var layer_Sport_heatmap_7 = new L.imageOverlay(img_Sport_heatmap_7,
@@ -598,7 +618,7 @@
         bounds_group.addLayer(layer_Sport_heatmap_7);
         map.addLayer(layer_Sport_heatmap_7);
         map.createPane('pane_Schools_heatmap_8');
-        map.getPane('pane_Schools_heatmap_8').style.zIndex = 408;
+        map.getPane('pane_Schools_heatmap_8').style.zIndex = 404;
         var img_Schools_heatmap_8 = 'data/Schools_heatmap_8.png';
         var img_bounds_Schools_heatmap_8 = [[60.38937553156401,22.156820491251903],[60.50136567649106,22.425865466547005]];
         var layer_Schools_heatmap_8 = new L.imageOverlay(img_Schools_heatmap_8,
@@ -660,20 +680,47 @@
             }
         });
         var overlaysTree = [
-            {label: "Heatmap of schools", layer: layer_Schools_heatmap_8},
-            {label: "Heatmap of sport & wellbeing services", layer: layer_Sport_heatmap_7},
-            {label: "Heatmap of culture services", layer: layer_Culture_heatmap_6},
-            {label: '<img src="legend/Tramstops_4.png" /> Tram stops', layer: layer_Tramstops_4},
-            {label: '<img src="legend/Tramline_3.png" /> Tramline', layer: layer_Tramline_3},
-            {label: 'Socioeconomic status (Postal code areas)<br />' +
-      '<table>' +
-      indicatorLegend.map(l =>
-        `<tr><td><i style="background:${l.color}; width:12px; height:12px; display:inline-block; margin-right:6px;border:1px solid #555; /*"></i></td><td>${l.label}</td></tr>`
-      ).join('') +
-      '</table>',
-    layer: layer_Postalcodeareas_1
-  },
-            {label: "Positron", layer: layer_Positronnolabels_0, radioGroup: 'bm' },]
+		// Add headings to the different layer categories
+			{
+				label: "<b>Heatmaps of services supporting wellbeing</b>",
+				children: [
+					{ label: "🏫 Schools", layer: layer_Schools_heatmap_8 },
+					{ label: "🏋️ Sport & wellbeing services", layer: layer_Sport_heatmap_7 },
+					{ label: "🎨 Culture services", layer: layer_Culture_heatmap_6 },
+				],
+			},
+			{
+				label: "<b>Future tramline and stops</b>",
+				children: [
+					{ label: '<img src="legend/Tramstops_4.png" /> Tram stops', layer: layer_Tramstops_4 },
+					{ label: '<img src="legend/Tramline_3.png" /> Tramline', layer: layer_Tramline_3 },
+				],
+			},
+			{
+				label: "<b>Socioeconomic status by postal code areas</b>",
+				children: [
+				{
+					label:
+						'Socioeconomic status (Postal code areas)<br />' +
+						'<table>' +
+						indicatorLegend
+						.map(
+						(l) =>
+							`<tr><td><i style="background:${l.color}; width:12px; height:12px; display:inline-block; margin-right:6px;border:1px solid #555;"></i></td><td>${l.label}</td></tr>`
+						)
+						.join('') +
+					'</table>',
+				layer: layer_Postalcodeareas_1,
+				},
+				],
+			},
+			{
+				label: "<b>Base map</b>",
+				children: [
+				{ label: "Positron", layer: layer_Positronnolabels_0, radioGroup: "bm" },
+				],
+			},
+			];
 			var lay = L.control.layers.tree(null, overlaysTree, {
 			    collapsed: true,
 			}).addTo(map);
