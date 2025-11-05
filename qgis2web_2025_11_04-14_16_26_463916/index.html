@@ -42,20 +42,15 @@
         <script src="data/Wellbeingservicesmerged_5.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
         <script>
-        var highlightLayer;
+          var highlightLayer;
         function highlightFeature(e) {
             highlightLayer = e.target;
 
-            if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
               highlightLayer.setStyle({
                 color: '#ffff00',
-              });
-            } else {
-              highlightLayer.setStyle({
-                fillColor: '#ffff00',
-                fillOpacity: 0.2
-              });
-            }
+				  weight:4,
+				  opacity: 0.5
+              });           
         }
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:5
