@@ -382,6 +382,10 @@
                 mouseover: highlightFeature,
             });
             var popupContent = '<table>\
+				<tr>\
+                        <th scope="row">Nimi</th>\
+                        <td class="visible-with-data" id="Nimi">' + (feature.properties['Nimi'] !== null ? autolinker.link(String(feature.properties['Nimi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
                     <tr>\
                         <th scope="row">school</th>\
                         <td class="visible-with-data" id="school">' + (feature.properties['school'] !== null ? autolinker.link(String(feature.properties['school']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -393,10 +397,6 @@
                     <tr>\
                         <th scope="row">sport</th>\
                         <td class="visible-with-data" id="sport">' + (feature.properties['sport'] !== null ? autolinker.link(String(feature.properties['sport']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Nimi</th>\
-                        <td class="visible-with-data" id="Nimi">' + (feature.properties['Nimi'] !== null ? autolinker.link(String(feature.properties['Nimi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
