@@ -147,7 +147,7 @@
             });
             var popupContent = '<table>\
                     <tr>\
-                        <th scope="row">Stop name</th>\
+                        <th scope="row">Name</th>\
                         <td class="visible-with-data" id="nimi">' + (feature.properties['nimi'] !== null ? autolinker.link(String(feature.properties['nimi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
@@ -383,19 +383,19 @@
             });
             var popupContent = '<table>\
 				<tr>\
-                        <th scope="row">Nimi</th>\
+                        <th scope="row">Stop name</th>\
                         <td class="visible-with-data" id="Nimi">' + (feature.properties['Nimi'] !== null ? autolinker.link(String(feature.properties['Nimi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">school</th>\
+                        <th scope="row">Schools</th>\
                         <td class="visible-with-data" id="school">' + (feature.properties['school'] !== null ? autolinker.link(String(feature.properties['school']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">culture</th>\
+                        <th scope="row">Culture services</th>\
                         <td class="visible-with-data" id="culture">' + (feature.properties['culture'] !== null ? autolinker.link(String(feature.properties['culture']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">sport</th>\
+                        <th scope="row">Sport and wellbeing services</th>\
                         <td class="visible-with-data" id="sport">' + (feature.properties['sport'] !== null ? autolinker.link(String(feature.properties['sport']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
