@@ -105,36 +105,68 @@
 					box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 					        ">
 					            <h3 style="margin: 0 0 4px 0; font-size: 18px;">Turku tramline impact on service accessibility</h3>
-					            <p style="margin: 0;">This map shows how the planned tram line influences accessibility to wellbeing services across different socio-economic areas in Turku.</p>
+					            <p style="margin: 0;">Helping Turku city decision-makers explore whether the tramline improves access to wellbeing services in socio-economically diverse areas</p>
 					        </div>
 					    `;
 					};
 				
         title.addTo(map);
-        var abstract = new L.Control({'position':'bottomleft'});
-        abstract.onAdd = function (map) {
-            this._div = L.DomUtil.create('div',
-            'leaflet-control abstract');
-            this._div.id = 'abstract'
+        var abstract = new L.Control({ position: 'bottomleft' });
 
-                abstract.show();
-                return this._div;
-            };
-            abstract.show = function () {
-                this._div.classList.remove("abstract");
-                this._div.classList.add("abstractUncollapsed");
-				// Add map instructions box
-				this._div.innerHTML = `
-					<div class="map-instructions-box">
-						<h3>Instructions</h3>
-						<p>
-							KESKEN / Here you can write short guidance for the user — for example:
-							how to zoom in/out, how to toggle layers, or how to interpret colors and symbols on the map.
-						</p>
-					</div>
-				`;
-			};
-        abstract.addTo(map);
+var abstract = new L.Control({ position: 'bottomleft' });
+
+abstract.onAdd = function (map) {
+    // Creating Instruction box that is a pop-up
+    this._div = L.DomUtil.create('div', 'leaflet-control leaflet-bar');
+    this._div.style.background = "rgba(255,255,255,0.95)";
+    this._div.style.padding = "6px";
+    this._div.style.borderRadius = "6px";
+    this._div.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
+    this._div.style.fontSize = "13px";
+    this._div.style.lineHeight = "1.4";
+    this._div.style.maxWidth = "280px";
+
+    // Adding the text
+    this._div.innerHTML = `
+        <button id="instructionsToggle" style="
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        ">Instructions ▼</button>
+        <div id="instructionsContent" style="display:none; margin-top:6px;">
+            <p>
+                • The map provides an overview of the socio-economic status of different districts in Turku, alongside the planned tramline and its stops.<br><br>
+                • By observing the heatmaps, you can see how municipal wellbeing-related services — schools, sports & wellbeing, and culture — are distributed across the city in relation to socio-economic areas and the tram route.<br><br>
+                • You can toggle map layers on and off using the panel in the top-right corner.<br><br>
+				• For more detailed information, click on a tram stop to view which and how many services are within a 400 m walking distance.<br><br>
+                • Click on postal code areas to view socio-economic details: share of people with basic education only, median income, and unemployment rate (%).
+            </p>
+        </div>
+    `;
+
+    const toggle = this._div.querySelector('#instructionsToggle');
+    const content = this._div.querySelector('#instructionsContent');
+
+    toggle.onclick = function (e) {
+        e.stopPropagation(); 
+        if (content.style.display === "none") {
+            content.style.display = "block";
+            toggle.innerHTML = "Instructions ▲";
+        } else {
+            content.style.display = "none";
+            toggle.innerHTML = "Instructions ▼";
+        }
+    };
+
+    L.DomEvent.disableClickPropagation(this._div);
+
+    return this._div;
+};
+
+abstract.addTo(map);
 		
         var zoomControl = L.control.zoom({
             position: 'topleft'
