@@ -200,23 +200,40 @@ abstract.addTo(map);
                     }
                 },
                 mouseover: highlightFeature,
-            });
+				// Add a zoom-in function
+				click: function(e) {
+					// Delete buffers and service points
+					if (map.hasLayer(layer_Buffers_2)) {
+						map.removeLayer(layer_Buffers_2);
+					}
+					if (map.hasLayer(layer_Wellbeingservicesmerged_5)) {
+						map.removeLayer(layer_Wellbeingservicesmerged_5);
+					}
+
+					// Hide Service points
+					var servicePart = document.getElementById('service-legend');
+					if (servicePart) servicePart.style.display = 'none';
+
+					// Zoom in + open popup
+					map.flyToBounds(e.target.getBounds(), { maxZoom: 14, padding: [20, 20] });
+					e.target.openPopup();
+				},
+		});
 			let indicatorValue = feature.properties['indicator'];
 			let indicatorLabel = '';
 
-			if (indicatorValue >= 0.000 && indicatorValue <= 0.106) {
-			    indicatorLabel = 'Very high';
-			} else if (indicatorValue > 0.106 && indicatorValue <= 0.165) {
-			    indicatorLabel = 'High';
-			} else if (indicatorValue > 0.165 && indicatorValue <= 0.219) {
-			    indicatorLabel = 'Moderate';
-			} else if (indicatorValue > 0.219 && indicatorValue <= 0.292) {
-			    indicatorLabel = 'Low';
-			} else if (indicatorValue > 0.292) {
-			    indicatorLabel = 'Very low';
+			if (indicatorValue < 0.10) {
+				indicatorLabel = 'Very high';
+			} else if (indicatorValue < 0.16) {
+				indicatorLabel = 'High';
+			} else if (indicatorValue < 0.21) {
+				indicatorLabel = 'Moderate';
+			} else if (indicatorValue < 0.26) {
+				indicatorLabel = 'Low';
 			} else {
-			    indicatorLabel = 'No data';
+				indicatorLabel = 'Very low';
 			}
+
             var popupContent = '<table>\
                     <tr>\
                         <th scope="row">Name</th>\
@@ -255,83 +272,35 @@ abstract.addTo(map);
 		  { color: 'rgba(213,213,213,0.7)', label: 'Low' },
 		  { color: 'rgba(250,250,250,0.7)', label: 'Very low' }
 		];
-        function style_Postalcodeareas_1_0(feature) {
-            if (feature.properties['indicator'] >= 0.000000 && feature.properties['indicator'] <= 0.106000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(102,102,102,0.7)',
-                interactive: true,
-            }
-            }
-            if (feature.properties['indicator'] >= 0.106000 && feature.properties['indicator'] <= 0.128000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(139,139,139,0.7)',
-                interactive: true,
-            }
-            }
-            if (feature.properties['indicator'] >= 0.128000 && feature.properties['indicator'] <= 0.172000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(176,176,176,0.7)',
-                interactive: true,
-            }
-            }
-            if (feature.properties['indicator'] >= 0.172000 && feature.properties['indicator'] <= 0.235000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(213,213,213,0.7)',
-                interactive: true,
-            }
-            }
-            if (feature.properties['indicator'] >= 0.235000 && feature.properties['indicator'] <= 0.272000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(250,250,250,0.7)',
-                interactive: true,
-            }
-            }
-        }
+		function style_Postalcodeareas_1_0(feature) {
+			const v = feature.properties['indicator'];
+			let fillColor = '';
+
+			if (v === null || typeof v === 'undefined' || isNaN(v)) {
+				fillColor = '#cccccc'; // No data
+			} else if (v < 0.10) {
+				fillColor = '#e4ebf0'; // Very high
+			} else if (v < 0.16) {
+				fillColor = '#b8c6d3'; // High
+			} else if (v < 0.21) {
+				fillColor = '#839db4'; // Moderate
+			} else if (v < 0.26) {
+				fillColor = '#516b84'; // Low
+			} else {
+				fillColor = '#2b3f5c'; // Very low
+		}
+
+    return {
+        pane: 'pane_Postalcodeareas_1',
+        opacity: 1,
+		color: 'rgba(170,185,201,0.8)',
+		weight: 0.6,
+        fill: true,
+        fillOpacity: 1,
+        fillColor: fillColor,
+        interactive: true
+    };
+}
         map.createPane('pane_Postalcodeareas_1');
         map.getPane('pane_Postalcodeareas_1').style.zIndex = 401;
         map.getPane('pane_Postalcodeareas_1').style['mix-blend-mode'] = 'normal';
@@ -460,7 +429,17 @@ abstract.addTo(map);
                     }
                 },
                 mouseover: highlightFeature,
-            });
+				
+				click: function(e) {
+				// A soft zoom to the tramstop
+				map.flyTo(e.latlng, 15, {
+					duration: 1.2 
+				});
+				// Open the pop-up
+				e.target.openPopup();
+				}
+			});
+		
             var popupContent = '<table>\
 				<tr>\
                         <th scope="row">Stop name</th>\
@@ -527,8 +506,19 @@ abstract.addTo(map);
         bounds_group.addLayer(layer_Tramstops_4);
         map.addLayer(layer_Tramstops_4);
 		layer_Tramstops_4.on('click', function(e){
-		    var stop_id = e.layer.feature.properties.stop_id; 
-		    showBufferAndServices(stop_id);
+			var stop_id = e.layer.feature.properties.stop_id; 
+			showBufferAndServices(stop_id);
+
+			// Show Service points
+			var servicePart = document.getElementById('service-legend');
+			if (servicePart) servicePart.style.display = 'block';
+		});
+		map.on('click', function(e) {
+			if (!e.originalEvent.target.closest('.leaflet-interactive') &&
+				!e.originalEvent.target.closest('.leaflet-popup')) {
+				var servicePart = document.getElementById('service-legend');
+				if (servicePart) servicePart.style.display = 'none';
+			}
 		});
         function pop_Wellbeingservicesmerged_5(feature, layer) {
             layer.on({
@@ -633,33 +623,45 @@ abstract.addTo(map);
 		map.removeLayer(layer_Wellbeingservicesmerged_5); 
         map.createPane('pane_Culture_heatmap_6');
         map.getPane('pane_Culture_heatmap_6').style.zIndex = 402;
-		var serviceLegend = L.control({ position: 'bottomright' });
-
-		serviceLegend.onAdd = function (map) {
-		    var div = L.DomUtil.create('div', 'info legend');
-		    div.style.background = 'white';
-		    div.style.padding = '8px';
-		    div.style.borderRadius = '6px';
-		    div.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
-		    div.style.lineHeight = '1.5em';
-		    div.style.fontSize = '12px';
-
-		    div.innerHTML += '<b>Service points</b><br>';
-
-		    for (const key in categoryColors) {
-		        div.innerHTML +=
-		            '<i style="background:' + categoryColors[key] + ';border-radius:50%; width:12px; height:12px; display:inline-block; margin-right:6px;"></i> ' +
-		            key + '<br>';
-		    }
-			div.innerHTML += '<hr style="margin:6px 0;">';
-			    div.innerHTML += '<b>Tram network</b><br>' +
-			        '<i style="background:none; border:2px solid #000000; width:18px; height:0; display:inline-block; margin-right:6px; vertical-align:middle;"></i> Tramline<br>' +
-			        // Tram stops (piste)
-			        '<i style="background:#FFFFFF; border:2px solid #000000; border-radius:50%; width:10px; height:10px; display:inline-block; margin-right:6px; vertical-align:middle;"></i> Tram stops<br>';
-
-		    return div;
+		
+		// Having tram line information always visible
+		var tramLegend = L.control({ position: 'bottomright' });
+		tramLegend.onAdd = function (map) {
+			var div = L.DomUtil.create('div', 'info legend');
+			div.style.background = 'white';
+			div.style.padding = '8px';
+			div.style.borderRadius = '6px';
+			div.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
+			div.style.lineHeight = '1.5em';
+			div.style.fontSize = '12px';
+			div.innerHTML =
+				'<b>Tram network</b><br>' +
+				'<i style="background:none; border:2px solid #000000; width:18px; height:0; display:inline-block; margin-right:6px; vertical-align:middle;"></i> Tramline<br>' +
+				'<i style="background:#FFFFFF; border:2px solid #000000; border-radius:50%; width:10px; height:10px; display:inline-block; margin-right:6px; vertical-align:middle;"></i> Tram stops';
+			return div;
 		};
+		tramLegend.addTo(map);
 
+		// Service points: only visible when the tramstoms are clicked and buffers are visible
+		var serviceLegend = L.control({ position: 'bottomright' });
+		serviceLegend.onAdd = function (map) {
+			var div = L.DomUtil.create('div', 'info legend');
+			div.id = 'service-legend';
+			div.style.background = 'white';
+			div.style.padding = '8px';
+			div.style.borderRadius = '6px';
+			div.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
+			div.style.lineHeight = '1.5em';
+			div.style.fontSize = '12px';
+			div.style.display = 'none'; // piilotettuna oletuksena
+			div.innerHTML = '<b>Service points</b><br>';
+			for (const key in categoryColors) {
+				div.innerHTML +=
+					'<i style="background:' + categoryColors[key] + '; border-radius:50%; width:12px; height:12px; display:inline-block; margin-right:6px;"></i> ' +
+					key + '<br>';
+			}
+			return div;
+		};
 		serviceLegend.addTo(map);
         var img_Culture_heatmap_6 = 'data/Culture_heatmap_6.png';
         var img_bounds_Culture_heatmap_6 = [[60.39846105519988,22.157601967981346],[60.496103264247516,22.42368253219364]];
