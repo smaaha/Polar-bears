@@ -219,22 +219,24 @@ abstract.addTo(map);
 					e.target.openPopup();
 				},
 		});
-			let indicatorValue = feature.properties['indicator'];
-			let indicatorLabel = '';
+		let indicatorLabel = '';
+		
+		const val = feature.properties['indicator'];
+		if (val >= 0.000000 && val <= 0.106000) {
+		  indicatorLabel = 'Very high';
+		} else if (val > 0.106000 && val <= 0.128000) {
+		  indicatorLabel = 'high';
+		} else if (val > 0.128000 && val <= 0.172000) {
+		  indicatorLabel = 'Moderate';
+		} else if (val > 0.172000 && val <= 0.235000) {
+		  indicatorLabel = 'Low';
+		} else if (val > 0.235000 && val <= 0.272000) {
+		  indicatorLabel = 'Very low';
+		} else {
+		  indicatorLabel = 'No data';
+		}
 
-			if (indicatorValue < 0.10) {
-				indicatorLabel = 'Very high';
-			} else if (indicatorValue < 0.16) {
-				indicatorLabel = 'High';
-			} else if (indicatorValue < 0.21) {
-				indicatorLabel = 'Moderate';
-			} else if (indicatorValue < 0.26) {
-				indicatorLabel = 'Low';
-			} else {
-				indicatorLabel = 'Very low';
-			}
-
-            var popupContent = '<table>\
+           var popupContent = '<table>\
                     <tr>\
                         <th scope="row">Name</th>\
                         <td class="visible-with-data" id="nimi">' + (feature.properties['nimi'] !== null ? autolinker.link(String(feature.properties['nimi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -266,40 +268,89 @@ abstract.addTo(map);
 			});
 		}
 			const indicatorLegend = [
-		  { color: 'rgba(35,35,35,0.7)', label: 'Very high' },
-		  { color: 'rgba(102,102,102,0.7)', label: 'High' },
-		  { color: 'rgba(176,176,176,0.7)', label: 'Moderate' },
-		  { color: 'rgba(213,213,213,0.7)', label: 'Low' },
-		  { color: 'rgba(250,250,250,0.7)', label: 'Very low' }
+		  { color: '#e4ebf0', label: 'Very high' },
+		  { color: '#b8c6d3', label: 'High' },
+		  { color: '#839db4', label: 'Moderate' },
+		  { color: '#516b84', label: 'Low' },
+		  { color: '#2b3f5c', label: 'Very low' }
 		];
-		function style_Postalcodeareas_1_0(feature) {
-			const v = feature.properties['indicator'];
-			let fillColor = '';
-
-			if (v === null || typeof v === 'undefined' || isNaN(v)) {
-				fillColor = '#cccccc'; // No data
-			} else if (v < 0.10) {
-				fillColor = '#e4ebf0'; // Very high
-			} else if (v < 0.16) {
-				fillColor = '#b8c6d3'; // High
-			} else if (v < 0.21) {
-				fillColor = '#839db4'; // Moderate
-			} else if (v < 0.26) {
-				fillColor = '#516b84'; // Low
-			} else {
-				fillColor = '#2b3f5c'; // Very low
-		}
-
-    return {
-        pane: 'pane_Postalcodeareas_1',
-        opacity: 1,
-		color: 'rgba(170,185,201,0.8)',
-		weight: 0.6,
-        fill: true,
-        fillOpacity: 1,
-        fillColor: fillColor,
-        interactive: true
-    };
+        function style_Postalcodeareas_1_0(feature) {
+            if (feature.properties['indicator'] >= 0.000000 && feature.properties['indicator'] <= 0.106000 ) {
+                return {
+                pane: 'pane_Postalcodeareas_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.7)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.3, 
+                fill: true,
+                fillOpacity: 0.9,
+                fillColor:'#e4ebf0',
+                interactive: true,
+            }
+            }
+            if (feature.properties['indicator'] >= 0.106000 && feature.properties['indicator'] <= 0.128000 ) {
+                return {
+                pane: 'pane_Postalcodeareas_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.7)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.3, 
+                fill: true,
+                fillOpacity: 0.9,
+                fillColor: '#b8c6d3',
+                interactive: true,
+            }
+            }
+            if (feature.properties['indicator'] >= 0.128000 && feature.properties['indicator'] <= 0.172000 ) {
+                return {
+                pane: 'pane_Postalcodeareas_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.7)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.3, 
+                fill: true,
+                fillOpacity: 0.9,
+                fillColor: '#839db4',
+                interactive: true,
+            }
+            }
+            if (feature.properties['indicator'] >= 0.172000 && feature.properties['indicator'] <= 0.235000 ) {
+                return {
+                pane: 'pane_Postalcodeareas_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.7)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.3, 
+                fill: true,
+                fillOpacity: 0.9,
+                fillColor:'#516b84' ,
+                interactive: true,
+            }
+            }
+            if (feature.properties['indicator'] >= 0.235000 && feature.properties['indicator'] <= 0.272000 ) {
+                return {
+                pane: 'pane_Postalcodeareas_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.7)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.5, 
+                fill: true,
+                fillOpacity: 0.9,
+                fillColor:'#2b3f5c',
+                interactive: true,
+            }
+            }
+	
 }
         map.createPane('pane_Postalcodeareas_1');
         map.getPane('pane_Postalcodeareas_1').style.zIndex = 401;
