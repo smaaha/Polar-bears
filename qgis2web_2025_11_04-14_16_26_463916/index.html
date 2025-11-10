@@ -776,12 +776,6 @@ abstract.addTo(map);
 			var lay = L.control.layers.tree(null, overlaysTree, {
 			    collapsed: true,
 			}).addTo(map);
-			var map = L.map('map').setView([30.182505,-93.318665], 12);        
-			L.tileLayer('https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {    
-					maxZoom: 18,
-				attribution: '<a href="https://cartodb.com/basemaps/">Map tiles by CartoDB, under CC BY 3.0. Data by OpenStreetMap, under ODbL.</a>'
-			}).addTo(map);
-			L.control.betterscale().addTo(map);
         setBounds();
         L.ImageOverlay.include({
             getBounds: function () {
