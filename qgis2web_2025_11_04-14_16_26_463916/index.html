@@ -18,6 +18,28 @@
             padding: 0;
             margin: 0;
         }
+		.leaflet-popup-content-wrapper,
+		.leaflet-popup-tip {
+		  background: white;          
+		  color: black;             
+		  border-radius: 8px;      
+		}
+
+		.leaflet-popup-content-wrapper {
+		  border: 1px solid #ccc;   
+		  padding: 8px;
+		}
+
+		.leaflet-popup-tip-container {
+		  display: none !important; 
+		}
+		.leaflet-popup-content {
+		  font-family: Arial, sans-serif;
+		  font-size: 13px;
+		  line-height: 1.4;
+		  margin: 0;
+		  padding: 0;
+		}
         </style>
         <title>Turku tramline impact on service accessibility </title>
     </head>
@@ -190,182 +212,128 @@ abstract.addTo(map);
         });
         layer_Positronnolabels_0;
         map.addLayer(layer_Positronnolabels_0);
-        function pop_Postalcodeareas_1(feature, layer) {
-            layer.on({
-                mouseout: function(e) {
-                    for (var i in e.target._eventParents) {
-                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
-                            e.target._eventParents[i].resetStyle(e.target);
-                        }
-                    }
-                },
-                mouseover: highlightFeature,
-				// Add a zoom-in function
-				click: function(e) {
-					// Delete buffers and service points
-					if (map.hasLayer(layer_Buffers_2)) {
-						map.removeLayer(layer_Buffers_2);
-					}
-					if (map.hasLayer(layer_Wellbeingservicesmerged_5)) {
-						map.removeLayer(layer_Wellbeingservicesmerged_5);
-					}
+		// Luo info control vain kerran
+		var info = L.control({ position: 'bottomright' });
 
-					// Hide Service points
-					var servicePart = document.getElementById('service-legend');
-					if (servicePart) servicePart.style.display = 'none';
+		info.onAdd = function (map) {
+		  this._div = L.DomUtil.create('div', 'info legend');
+		  this.update();
+		  return this._div;
+		};
 
-					// Zoom in + open popup
-					map.flyToBounds(e.target.getBounds(), { maxZoom: 14, padding: [20, 20] });
-					e.target.openPopup();
-				},
-		});
-		let indicatorLabel = '';
-		
-		const val = feature.properties['indicator'];
-		if (val >= 0.000000 && val <= 0.106000) {
-		  indicatorLabel = 'Very high';
-		} else if (val > 0.106000 && val <= 0.128000) {
-		  indicatorLabel = 'high';
-		} else if (val > 0.128000 && val <= 0.172000) {
-		  indicatorLabel = 'Moderate';
-		} else if (val > 0.172000 && val <= 0.235000) {
-		  indicatorLabel = 'Low';
-		} else if (val > 0.235000 && val <= 0.272000) {
-		  indicatorLabel = 'Very low';
-		} else {
-		  indicatorLabel = 'No data';
+		// Päivitä laatikon sisältö hoverin mukaan
+		info.update = function (props) {
+		  this._div.innerHTML =
+		'<div style="padding:5px 8px; max-width:200px; font-size:12px; line-height:1.2; background-color:rgba(255,255,255,0.9); border-radius:6px; box-shadow:0 0 5px rgba(0,0,0,0.3);">' +
+		    '<h4 style="margin:0 0 4px 0; font-size:14px;">Socioeconomic status</h4>' +
+		    (props
+		      ? '<b>' + props.nimi + '</b><br />' +
+		        'Basic education only: <span style="font-weight:bold; color:#000;">' + props.ko_perus + '</span><br />' +
+		        'Median income:<span style="font-weight:bold; color:#000;">' + props.hr_mtu + '</span><br />' +
+		        'Unemployment rate: <span style="font-weight:bold; color:#000;">' + props.Emplyotyme + ' %</span><br />' +
+		        '<b>Overall:</b> ' + getIndicatorLabel(props.indicator)
+		      : 'Hover over an area');
+		};
+
+		info.addTo(map);
+
+		// Funktio, joka palauttaa status-tason tekstin
+		function getIndicatorLabel(val) {
+		  if (val >= 0.000000 && val <= 0.106000) return 'Very high';
+		  if (val > 0.106000 && val <= 0.128000) return 'High';
+		  if (val > 0.128000 && val <= 0.172000) return 'Moderate';
+		  if (val > 0.172000 && val <= 0.235000) return 'Low';
+		  if (val > 0.235000 && val <= 0.272000) return 'Very low';
+		  return 'No data';
 		}
 
-           var popupContent = '<table>\
-                    <tr>\
-                        <th scope="row">Name</th>\
-                        <td class="visible-with-data" id="nimi">' + (feature.properties['nimi'] !== null ? autolinker.link(String(feature.properties['nimi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Basic education only</th>\
-                        <td>' + (feature.properties['ko_perus'] !== null ? autolinker.link(String(feature.properties['ko_perus']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Median income</th>\
-                        <td>' + (feature.properties['hr_mtu'] !== null ? autolinker.link(String(feature.properties['hr_mtu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Unemployment rate (%)</th>\
-                        <td class="visible-with-data" id="Emplyotyme">' + (feature.properties['Emplyotyme'] !== null ? autolinker.link(String(feature.properties['Emplyotyme']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-			</table>\
-<p style="margin:2px 0; line-height:1.0; font-size:13px; color:#333;">\
-<b>Socioeconomic status: </b>' + indicatorLabel + '\
-			</p>';
-            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-			layer.on('popupopen', function(e) {
-				addClassToPopupIfMedia(content, e.popup);
-			});
-			layer.bindPopup(content, {
-			  maxHeight: 300,
-			  maxWidth: 300,
-			  offset: L.point(10, -5)
-			});
+		// Postal code -alueiden tyyli
+		function style_Postalcodeareas_1_0(feature) {
+		  let color = '#e4ebf0';
+		  const val = feature.properties['indicator'];
+		  if (val >= 0.000000 && val <= 0.106000) color = '#e4ebf0';
+		  else if (val > 0.106000 && val <= 0.128000) color = '#b8c6d3';
+		  else if (val > 0.128000 && val <= 0.172000) color = '#839db4';
+		  else if (val > 0.172000 && val <= 0.235000) color = '#516b84';
+		  else if (val > 0.235000 && val <= 0.272000) color = '#2b3f5c';
+
+		  return {
+		    pane: 'pane_Postalcodeareas_1',
+		    opacity: 1,
+		    color: 'rgba(35,35,35,0.7)',
+		    dashArray: '',
+		    lineCap: 'butt',
+		    lineJoin: 'miter',
+		    weight: 0.3,
+		    fill: true,
+		    fillOpacity: 0.9,
+		    fillColor: color,
+		    interactive: true,
+		  };
 		}
-			const indicatorLegend = [
+
+		//  Hover & click -toiminnot
+		function pop_Postalcodeareas_1(feature, layer) {
+		  layer.on({
+		    mouseover: function (e) {
+		      var layer = e.target;
+		      layer.setStyle({
+		        weight: 1.0,
+		        color: '#666',
+		        fillOpacity: 1
+		      });
+		      info.update(layer.feature.properties);
+		    },
+		    mouseout: function (e) {
+		      for (var i in e.target._eventParents) {
+		        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+		          e.target._eventParents[i].resetStyle(e.target);
+		        }
+		      }
+		      info.update(); // tyhjennä info-laatikko kun hiiri poistuu
+		    },
+		    click: function (e) {
+		      // Poista ylimääräiset kerrokset tarvittaessa
+		      if (map.hasLayer(layer_Buffers_2)) map.removeLayer(layer_Buffers_2);
+		      if (map.hasLayer(layer_Wellbeingservicesmerged_5)) map.removeLayer(layer_Wellbeingservicesmerged_5);
+
+		      // Piilota palvelupistelegenda
+		      var servicePart = document.getElementById('service-legend');
+		      if (servicePart) servicePart.style.display = 'none';
+
+		      // Zoomaa postinumeroalueeseen
+		      map.flyToBounds(e.target.getBounds(), { maxZoom: 14, padding: [20, 20] });
+		    }
+		  });
+		}
+
+		//Värit legendaan
+		const indicatorLegend = [
 		  { color: '#e4ebf0', label: 'Very high' },
 		  { color: '#b8c6d3', label: 'High' },
 		  { color: '#839db4', label: 'Moderate' },
 		  { color: '#516b84', label: 'Low' },
 		  { color: '#2b3f5c', label: 'Very low' }
 		];
-        function style_Postalcodeareas_1_0(feature) {
-            if (feature.properties['indicator'] >= 0.000000 && feature.properties['indicator'] <= 0.106000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 0.3, 
-                fill: true,
-                fillOpacity: 0.9,
-                fillColor:'#e4ebf0',
-                interactive: true,
-            }
-            }
-            if (feature.properties['indicator'] >= 0.106000 && feature.properties['indicator'] <= 0.128000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 0.3, 
-                fill: true,
-                fillOpacity: 0.9,
-                fillColor: '#b8c6d3',
-                interactive: true,
-            }
-            }
-            if (feature.properties['indicator'] >= 0.128000 && feature.properties['indicator'] <= 0.172000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 0.3, 
-                fill: true,
-                fillOpacity: 0.9,
-                fillColor: '#839db4',
-                interactive: true,
-            }
-            }
-            if (feature.properties['indicator'] >= 0.172000 && feature.properties['indicator'] <= 0.235000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 0.3, 
-                fill: true,
-                fillOpacity: 0.9,
-                fillColor:'#516b84' ,
-                interactive: true,
-            }
-            }
-            if (feature.properties['indicator'] >= 0.235000 && feature.properties['indicator'] <= 0.272000 ) {
-                return {
-                pane: 'pane_Postalcodeareas_1',
-                opacity: 1,
-                color: 'rgba(35,35,35,0.7)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 0.5, 
-                fill: true,
-                fillOpacity: 0.9,
-                fillColor:'#2b3f5c',
-                interactive: true,
-            }
-            }
-	
-}
-        map.createPane('pane_Postalcodeareas_1');
-        map.getPane('pane_Postalcodeareas_1').style.zIndex = 401;
-        map.getPane('pane_Postalcodeareas_1').style['mix-blend-mode'] = 'normal';
-        var layer_Postalcodeareas_1 = new L.geoJson(json_Postalcodeareas_1, {
-            attribution: '',
-            interactive: true,
-            dataVar: 'json_Postalcodeareas_1',
-            layerName: 'layer_Postalcodeareas_1',
-            pane: 'pane_Postalcodeareas_1',
-            onEachFeature: pop_Postalcodeareas_1,
-            style: style_Postalcodeareas_1_0,
-        });
-        bounds_group.addLayer(layer_Postalcodeareas_1);
-        map.addLayer(layer_Postalcodeareas_1);
+
+		//Luodaan layer ja lisätään kartalle
+		map.createPane('pane_Postalcodeareas_1');
+		map.getPane('pane_Postalcodeareas_1').style.zIndex = 401;
+		map.getPane('pane_Postalcodeareas_1').style['mix-blend-mode'] = 'normal';
+
+		var layer_Postalcodeareas_1 = new L.geoJson(json_Postalcodeareas_1, {
+		  attribution: '',
+		  interactive: true,
+		  dataVar: 'json_Postalcodeareas_1',
+		  layerName: 'layer_Postalcodeareas_1',
+		  pane: 'pane_Postalcodeareas_1',
+		  onEachFeature: pop_Postalcodeareas_1,
+		  style: style_Postalcodeareas_1_0,
+		});
+
+		bounds_group.addLayer(layer_Postalcodeareas_1);
+		map.addLayer(layer_Postalcodeareas_1);
+       
         function pop_Buffers_2(feature, layer) {
             layer.on({
                 mouseout: function(e) {
@@ -497,15 +465,15 @@ abstract.addTo(map);
                         <td class="visible-with-data" id="Nimi">' + (feature.properties['Nimi'] !== null ? autolinker.link(String(feature.properties['Nimi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Schools</th>\
+                        <th scope="row">🔵 Schools</th>\
                         <td class="visible-with-data" id="school">' + (feature.properties['school'] !== null ? autolinker.link(String(feature.properties['school']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Culture services</th>\
+                        <th scope="row">🟠 Culture services</th>\
                         <td class="visible-with-data" id="culture">' + (feature.properties['culture'] !== null ? autolinker.link(String(feature.properties['culture']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Sport & wellbeing</th>\
+                        <th scope="row">🔴 Sport & wellbeing</th>\
                         <td class="visible-with-data" id="sport">' + (feature.properties['sport'] !== null ? autolinker.link(String(feature.properties['sport']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
@@ -514,7 +482,7 @@ abstract.addTo(map);
 				addClassToPopupIfMedia(content, e.popup);
 			});
 			layer.bindPopup(content, { maxHeight: 400,
-			 offset: L.point(30, -10) });
+			 offset: L.point(150,-100 ) });
         }
 
         function style_Tramstops_4_0() {
@@ -650,7 +618,7 @@ abstract.addTo(map);
         map.createPane('pane_Wellbeingservicesmerged_5');
         map.getPane('pane_Wellbeingservicesmerged_5').style.zIndex = 405;
         map.getPane('pane_Wellbeingservicesmerged_5').style['mix-blend-mode'] = 'normal';
-		const categoryColors = {
+		const categoryColors= {
 		  'Culture services': '#ffa500',
 		  'Schools': '#0000ff',
 		  'Sport & Wellbeing services': '#FF0000'
@@ -692,28 +660,6 @@ abstract.addTo(map);
 			return div;
 		};
 		tramLegend.addTo(map);
-
-		// Service points: only visible when the tramstoms are clicked and buffers are visible
-		var serviceLegend = L.control({ position: 'bottomright' });
-		serviceLegend.onAdd = function (map) {
-			var div = L.DomUtil.create('div', 'info legend');
-			div.id = 'service-legend';
-			div.style.background = 'white';
-			div.style.padding = '8px';
-			div.style.borderRadius = '6px';
-			div.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
-			div.style.lineHeight = '1.5em';
-			div.style.fontSize = '12px';
-			div.style.display = 'none'; // piilotettuna oletuksena
-			div.innerHTML = '<b>Service points</b><br>';
-			for (const key in categoryColors) {
-				div.innerHTML +=
-					'<i style="background:' + categoryColors[key] + '; border-radius:50%; width:12px; height:12px; display:inline-block; margin-right:6px;"></i> ' +
-					key + '<br>';
-			}
-			return div;
-		};
-		serviceLegend.addTo(map);
         var img_Culture_heatmap_6 = 'data/Culture_heatmap_6.png';
         var img_bounds_Culture_heatmap_6 = [[60.39846105519988,22.157601967981346],[60.496103264247516,22.42368253219364]];
         var layer_Culture_heatmap_6 = new L.imageOverlay(img_Culture_heatmap_6,
@@ -830,6 +776,12 @@ abstract.addTo(map);
 			var lay = L.control.layers.tree(null, overlaysTree, {
 			    collapsed: true,
 			}).addTo(map);
+			var map = L.map('map').setView([30.182505,-93.318665], 12);        
+			L.tileLayer('https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {    
+					maxZoom: 18,
+				attribution: '<a href="https://cartodb.com/basemaps/">Map tiles by CartoDB, under CC BY 3.0. Data by OpenStreetMap, under ODbL.</a>'
+			}).addTo(map);
+			L.control.betterscale().addTo(map);
         setBounds();
         L.ImageOverlay.include({
             getBounds: function () {
