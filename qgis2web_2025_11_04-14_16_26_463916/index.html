@@ -69,8 +69,8 @@
             highlightLayer = e.target;
 
               highlightLayer.setStyle({
-                color: '#ffff00',
-				  weight:4,
+                color: '#ffffff',
+				  weight:6,
 				  opacity: 0.5
               });           
         }
@@ -276,12 +276,7 @@ abstract.addTo(map);
 		function pop_Postalcodeareas_1(feature, layer) {
 		  layer.on({
 		    mouseover: function (e) {
-		      var layer = e.target;
-		      layer.setStyle({
-		        weight: 1.0,
-		        color: '#666',
-		        fillOpacity: 1
-		      });
+		      highlightFeature (e);
 		      info.update(layer.feature.properties);
 		    },
 		    mouseout: function (e) {
@@ -641,7 +636,7 @@ abstract.addTo(map);
 		bounds_group.addLayer(layer_Wellbeingservicesmerged_5); 
 		map.removeLayer(layer_Wellbeingservicesmerged_5); 
         map.createPane('pane_Culture_heatmap_6');
-        map.getPane('pane_Culture_heatmap_6').style.zIndex = 402;
+        map.getPane('pane_Culture_heatmap_6').style.zIndex = 404;
 		
 		// Having tram line information always visible
 		var tramLegend = L.control({ position: 'bottomright' });
@@ -677,7 +672,7 @@ abstract.addTo(map);
         bounds_group.addLayer(layer_Sport_heatmap_7);
         map.addLayer(layer_Sport_heatmap_7);
         map.createPane('pane_Schools_heatmap_8');
-        map.getPane('pane_Schools_heatmap_8').style.zIndex = 404;
+        map.getPane('pane_Schools_heatmap_8').style.zIndex = 402;
         var img_Schools_heatmap_8 = 'data/Schools_heatmap_8.png';
         var img_bounds_Schools_heatmap_8 = [[60.38937553156401,22.156820491251903],[60.50136567649106,22.425865466547005]];
         var layer_Schools_heatmap_8 = new L.imageOverlay(img_Schools_heatmap_8,
