@@ -11,6 +11,7 @@
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet.photon.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
         <style>
         html, body, #map {
             width: 100%;
@@ -63,6 +64,7 @@
         <script src="data/Tramstops_4.js"></script>
         <script src="data/Wellbeingservicesmerged_5.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+		<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
         <script>
           var highlightLayer;
         function highlightFeature(e) {
@@ -118,10 +120,10 @@
            // Add a white box with text after the heading
             this._div.innerHTML = `
 				<div style="
-					background-color: rgba(255,255,255,0.9);
+					background-color: rgba(255,255,255,0.8);
 					padding: 6px 10px;
 					border-radius: 6px;
-					max-width: 400px;
+					max-width: 435px;
 					line-height: 1.3;
 					font-size: 13px;
 					box-shadow: 0 1px 4px rgba(0,0,0,0.2);
@@ -133,63 +135,82 @@
 					};
 				
         title.addTo(map);
-        var abstract = new L.Control({ position: 'bottomleft' });
+		var instructionsControl = L.control({ position: 'bottomleft' });
 
-var abstract = new L.Control({ position: 'bottomleft' });
+		instructionsControl.onAdd = function(map) {
+		    // Luodaan ohjenappi
+		    this._div = L.DomUtil.create('div', 'leaflet-control leaflet-bar');
+		    this._div.style.background = "rgba(255,255,255,0.95)";
+		    this._div.style.padding = "6px";
+		    this._div.style.borderRadius = "6px";
+		    this._div.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
+		    this._div.style.cursor = "pointer";
+		    this._div.style.display = "flex";
+		    this._div.style.alignItems = "center";
+		    this._div.style.justifyContent = "center";
+			this._div.style.fontSize = "22px"; 
 
-abstract.onAdd = function (map) {
-    // Creating Instruction box that is a pop-up
-    this._div = L.DomUtil.create('div', 'leaflet-control leaflet-bar');
-    this._div.style.background = "rgba(255,255,255,0.95)";
-    this._div.style.padding = "6px";
-    this._div.style.borderRadius = "6px";
-    this._div.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
-    this._div.style.fontSize = "13px";
-    this._div.style.lineHeight = "1.4";
-    this._div.style.maxWidth = "280px";
+		    this._div.innerHTML = `<i class="fas fa-info"></i>`;
 
-    // Adding the text
-    this._div.innerHTML = `
-        <button id="instructionsToggle" style="
-            width: 100%;
-            text-align: left;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        ">Instructions ▼</button>
-        <div id="instructionsContent" style="display:none; margin-top:6px;">
-            <p>
-                • The map provides an overview of the socio-economic status of different districts in Turku, alongside the planned tramline and its stops.<br><br>
-                • By observing the heatmaps, you can see how municipal wellbeing-related services — schools, sports & wellbeing, and culture — are distributed across the city in relation to socio-economic areas and the tram route.<br><br>
-                • You can toggle map layers on and off using the panel in the top-right corner.<br><br>
-				• For more detailed information, click on a tram stop to view which and how many services are within a 400 m walking distance.<br><br>
-                • Click on postal code areas to view socio-economic details: share of people with basic education only, median income, and unemployment rate (%).
-            </p>
-        </div>
-    `;
+		    // Luo ohjeboksi bodyyn, fixed position
+		    const content = document.createElement('div');
+		    content.id = 'instructionsContent';
+		    content.style.position = 'fixed';
+		    content.style.top = '250px';
+		    content.style.left = '20px';  // aluksi piilossa vasemmalla
+		    content.style.width = '300px';
+		    content.style.height = 'auto';
+		    content.style.backgroundColor = 'rgba(255,255,255,0.95)';
+		    content.style.padding = '12px';
+		    content.style.borderRadius = '6px';
+		    content.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+		    content.style.fontSize = '13px';
+			content.style.fontFamily = "Arial, sans-serif";
+		    content.style.lineHeight = '1.2';
+		    content.style.zIndex = 10000;
+		    content.style.transition = 'left 0.3s ease'; // liukuefekti
+		    content.innerHTML = `
+		        <button id="instructionsClose" style="
+		            border: none;
+		            background: none;
+		            font-size: 15px;
+		            cursor: pointer;
+		            float: right;
+		        ">✕</button>
+		        <p><b>Instructions:</b><br><br>
+					
+		            • The map provides an overview of the socio-economic status of different districts in Turku, alongside the planned tramline and its stops.<br><br>
+		            • By observing the heatmaps, you can see how municipal wellbeing-related services — schools, sports & wellbeing, and culture — are distributed across the city in relation to socio-economic areas and the tram route.<br><br>
+		            • You can toggle map layers on and off using the panel in the top-right corner.<br><br>
+		            • For more detailed information, click on a tram stop to view which and how many services are within a 400 m walking distance.<br><br>
+		            • Click on postal code areas to view socio-economic details: share of people with basic education only, median income, and unemployment rate (%).<br><br>
+					Data: <a href="https://stat.fi/tup/paavo/index_en.html" target="_blank" rel="noopener">
+    the PAAVO service (Statistics Finland),<a href="https://www.avoindata.fi/data/fi/dataset/turun-raitiotiesuunnitelma" target="_blank" rel="noopener"> Turku Tramway plan (Turku City),<a href="https://www.avoindata.fi/data/fi/dataset/varsinais-suomen-ja-satakunnan-palvelupisteet" target="_blank" rel="noopener">Service points (Lounaistieto) 
+  </a><br><br>
+					Authors: Polar Bears, University of Turku
+		        </p>
+		    `;
+		    document.body.appendChild(content);
 
-    const toggle = this._div.querySelector('#instructionsToggle');
-    const content = this._div.querySelector('#instructionsContent');
+		    // Avaa boxi napin klikkauksella
+		    this._div.addEventListener('click', function() {
+		        content.style.left = '20px';  // liu'uta näkyviin
+		    });
 
-    toggle.onclick = function (e) {
-        e.stopPropagation(); 
-        if (content.style.display === "none") {
-            content.style.display = "block";
-            toggle.innerHTML = "Instructions ▲";
-        } else {
-            content.style.display = "none";
-            toggle.innerHTML = "Instructions ▼";
-        }
-    };
+		    // Sulje boxi ristin napista
+		    const closeBtn = content.querySelector('#instructionsClose');
+		    closeBtn.addEventListener('click', function() {
+		        content.style.left = '-320px';  // liu'uta piiloon
+		    });
 
-    L.DomEvent.disableClickPropagation(this._div);
+		    L.DomEvent.disableClickPropagation(this._div);
+		    return this._div;
+		};
 
-    return this._div;
-};
+		instructionsControl.addTo(map);
 
-abstract.addTo(map);
 		
+
         var zoomControl = L.control.zoom({
             position: 'topleft'
         }).addTo(map);
@@ -224,12 +245,12 @@ abstract.addTo(map);
 		// Päivitä laatikon sisältö hoverin mukaan
 		info.update = function (props) {
 		  this._div.innerHTML =
-		'<div style="padding:5px 8px; max-width:200px; font-size:12px; line-height:1.2; background-color:rgba(255,255,255,0.9); border-radius:6px; box-shadow:0 0 5px rgba(0,0,0,0.3);">' +
-		    '<h4 style="margin:0 0 4px 0; font-size:14px;">Socioeconomic status</h4>' +
+		'<div style="padding:5px 8px; max-width:300px; font-size:14px; line-height:1.2; background-color:rgba(255,255,255,0.9); border-radius:6px; box-shadow:0 0 5px rgba(0,0,0,0.3);">' +
+		    '<h4 style="margin:0 0 4px 0; font-size:15px;">Socioeconomic status</h4>' +
 		    (props
 		      ? '<b>' + props.nimi + '</b><br />' +
 		        'Basic education only: <span style="font-weight:bold; color:#000;">' + props.ko_perus + '</span><br />' +
-		        'Median income:<span style="font-weight:bold; color:#000;">' + props.hr_mtu + '</span><br />' +
+		        'Median income: <span style="font-weight:bold; color:#000;">' + props.hr_mtu + '</span><br />' +
 		        'Unemployment rate: <span style="font-weight:bold; color:#000;">' + props.Emplyotyme + ' %</span><br />' +
 		        '<b>Overall:</b> ' + getIndicatorLabel(props.indicator)
 		      : 'Hover over an area');
@@ -266,17 +287,18 @@ abstract.addTo(map);
 		    lineJoin: 'miter',
 		    weight: 0.3,
 		    fill: true,
-		    fillOpacity: 0.9,
+		    fillOpacity: 0.7,
 		    fillColor: color,
 		    interactive: true,
 		  };
+		 
 		}
 
 		//  Hover & click -toiminnot
 		function pop_Postalcodeareas_1(feature, layer) {
 		  layer.on({
 		    mouseover: function (e) {
-		      highlightFeature (e);
+				highlightFeature(e);
 		      info.update(layer.feature.properties);
 		    },
 		    mouseout: function (e) {
@@ -497,7 +519,7 @@ abstract.addTo(map);
             }
         }
         map.createPane('pane_Tramstops_4');
-        map.getPane('pane_Tramstops_4').style.zIndex = 407;
+        map.getPane('pane_Tramstops_4').style.zIndex = 408;
         map.getPane('pane_Tramstops_4').style['mix-blend-mode'] = 'normal';
         var layer_Tramstops_4 = new L.geoJson(json_Tramstops_4, {
             attribution: '',
@@ -659,36 +681,36 @@ abstract.addTo(map);
         var img_bounds_Culture_heatmap_6 = [[60.39846105519988,22.157601967981346],[60.496103264247516,22.42368253219364]];
         var layer_Culture_heatmap_6 = new L.imageOverlay(img_Culture_heatmap_6,
                                               img_bounds_Culture_heatmap_6,
-                                              {pane: 'pane_Culture_heatmap_6', opacity:0.7});
+                                              {pane: 'pane_Culture_heatmap_6', opacity:1});
         bounds_group.addLayer(layer_Culture_heatmap_6);
-        map.addLayer(layer_Culture_heatmap_6);
+		  map.addLayer(layer_Culture_heatmap_6);
         map.createPane('pane_Sport_heatmap_7');
         map.getPane('pane_Sport_heatmap_7').style.zIndex = 403;
         var img_Sport_heatmap_7 = 'data/Sport_heatmap_7.png';
         var img_bounds_Sport_heatmap_7 = [[60.38274903992388,22.07849305479689],[60.500974814231526,22.4333581376815]];
         var layer_Sport_heatmap_7 = new L.imageOverlay(img_Sport_heatmap_7,
                                               img_bounds_Sport_heatmap_7,
-                                              {pane: 'pane_Sport_heatmap_7', opacity:0.7});
+                                              {pane: 'pane_Sport_heatmap_7', opacity:1});
         bounds_group.addLayer(layer_Sport_heatmap_7);
-        map.addLayer(layer_Sport_heatmap_7);
+		 map.addLayer(layer_Sport_heatmap_7);
         map.createPane('pane_Schools_heatmap_8');
         map.getPane('pane_Schools_heatmap_8').style.zIndex = 402;
         var img_Schools_heatmap_8 = 'data/Schools_heatmap_8.png';
         var img_bounds_Schools_heatmap_8 = [[60.38937553156401,22.156820491251903],[60.50136567649106,22.425865466547005]];
         var layer_Schools_heatmap_8 = new L.imageOverlay(img_Schools_heatmap_8,
                                               img_bounds_Schools_heatmap_8,
-                                              {pane: 'pane_Schools_heatmap_8', opacity:0.7});
+                                              {pane: 'pane_Schools_heatmap_8', opacity:1});
         bounds_group.addLayer(layer_Schools_heatmap_8);
-        map.addLayer(layer_Schools_heatmap_8);
-        const url = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&",
-        "France BAN": "https://api-adresse.data.gouv.fr/search/?"}
+		 map.addLayer(layer_Schools_heatmap_8);
+        const url = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&viewbox=22.10,60.35,22.45,60.55&bounded=1&",
+  "France BAN": "https://api-adresse.data.gouv.fr/search/?"}
         var photonControl = L.control.photon({
             url: url["Nominatim OSM"],
             feedbackLabel: '',
             position: 'topleft',
             includePosition: true,
             initial: true,
-            // resultsHandler: myHandler,
+			noResultsMessage: 'no results found',
         }).addTo(map);
         photonControl._container.childNodes[0].style.borderRadius="10px"
         // Create a variable to store the geoJSON data
@@ -760,17 +782,18 @@ abstract.addTo(map);
 				layer: layer_Postalcodeareas_1,
 				},
 				],
-			},
-			{
-				label: '<span style="font-size:14px;"><b>Base map</b>',
-				children: [
-				{ label: "Positron", layer: layer_Positronnolabels_0, radioGroup: "bm" },
-				],
-			},
+			}
 			];
 			var lay = L.control.layers.tree(null, overlaysTree, {
 			    collapsed: true,
 			}).addTo(map);
+			map.whenReady(function() {
+			    // Etsi elementti, joka sisältää kaikki kontrollin layerit
+			    var container = document.querySelector('.leaflet-control-layers');
+			    if (container) {
+			        container.classList.add('leaflet-control-layers-expanded');
+			    }
+			});
         setBounds();
         L.ImageOverlay.include({
             getBounds: function () {
