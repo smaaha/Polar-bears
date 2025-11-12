@@ -36,7 +36,7 @@
 		}
 		.leaflet-popup-content {
 		  font-family: Arial, sans-serif;
-		  font-size: 13px;
+		  font-size: 14px;
 		  line-height: 1.4;
 		  margin: 0;
 		  padding: 0;
@@ -121,14 +121,12 @@
             this._div.innerHTML = `
 				<div style="
 					background-color: rgba(255,255,255,0.8);
-					padding: 6px 10px;
-					border-radius: 6px;
+					padding: 10px 10px;
 					max-width: 435px;
 					line-height: 1.3;
-					font-size: 13px;
-					box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+					font-size: 16px;
 					        ">
-					            <h3 style="margin: 0 0 4px 0; font-size: 18px;">Turku tramline impact on service accessibility</h3>
+					            <h3 style="margin: 0 0 4px 0; font-size: 26px;">Turku tramline impact on service accessibility</h3>
 					            <p style="margin: 0;">Helping Turku city decision-makers explore whether the tramline improves access to wellbeing services in socio-economically diverse areas</p>
 					        </div>
 					    `;
@@ -156,9 +154,9 @@
 		    const content = document.createElement('div');
 		    content.id = 'instructionsContent';
 		    content.style.position = 'fixed';
-		    content.style.top = '250px';
+		    content.style.top = '230px';
 		    content.style.left = '20px';  // aluksi piilossa vasemmalla
-		    content.style.width = '300px';
+		    content.style.width = '500px';
 		    content.style.height = 'auto';
 		    content.style.backgroundColor = 'rgba(255,255,255,0.95)';
 		    content.style.padding = '12px';
@@ -177,17 +175,17 @@
 		            cursor: pointer;
 		            float: right;
 		        ">✕</button>
-		        <p><b>Instructions:</b><br><br>
+				<h3 style="margin:0 0 8px 0; font-size:18px;">Instructions</h3>
+		        <p>
 					
-		            • The map provides an overview of the socio-economic status of different districts in Turku, alongside the planned tramline and its stops.<br><br>
-		            • By observing the heatmaps, you can see how municipal wellbeing-related services — schools, sports & wellbeing, and culture — are distributed across the city in relation to socio-economic areas and the tram route.<br><br>
-		            • You can toggle map layers on and off using the panel in the top-right corner.<br><br>
-		            • For more detailed information, click on a tram stop to view which and how many services are within a 400 m walking distance.<br><br>
-		            • Click on postal code areas to view socio-economic details: share of people with basic education only, median income, and unemployment rate (%).<br><br>
-					Data: <a href="https://stat.fi/tup/paavo/index_en.html" target="_blank" rel="noopener">
+		            The map provides an overview of the socio-economic status of different districts in Turku, alongside the planned tramline and its stops.<br><br>
+		            By observing the heatmaps, you can see how municipal wellbeing-related services — schools, sports & wellbeing, and culture — are distributed across the city in relation to socio-economic areas and the tram route. You can toggle map layers on and off using the panel in the top-right corner.<br><br>
+		            For more detailed information, click on a tram stop to view which and how many services are within a 400 m walking distance.<br><br>
+		            Click on postal code areas to view socio-economic details: amount of people with basic education only, median income, and unemployment rate (%).<br><br>
+					<i><b>Data:</b> <a href="https://stat.fi/tup/paavo/index_en.html" target="_blank" rel="noopener">
     the PAAVO service (Statistics Finland),<a href="https://www.avoindata.fi/data/fi/dataset/turun-raitiotiesuunnitelma" target="_blank" rel="noopener"> Turku Tramway plan (Turku City),<a href="https://www.avoindata.fi/data/fi/dataset/varsinais-suomen-ja-satakunnan-palvelupisteet" target="_blank" rel="noopener">Service points (Lounaistieto) 
   </a><br><br>
-					Authors: Polar Bears, University of Turku
+					<b>Authors:</b> Polar Bears, University of Turku<i>
 		        </p>
 		    `;
 		    document.body.appendChild(content);
@@ -200,7 +198,7 @@
 		    // Sulje boxi ristin napista
 		    const closeBtn = content.querySelector('#instructionsClose');
 		    closeBtn.addEventListener('click', function() {
-		        content.style.left = '-320px';  // liu'uta piiloon
+		        content.style.left = '-540px';  // liu'uta piiloon
 		    });
 
 		    L.DomEvent.disableClickPropagation(this._div);
@@ -244,17 +242,18 @@
 
 		// Päivitä laatikon sisältö hoverin mukaan
 		info.update = function (props) {
-		  this._div.innerHTML =
-		'<div style="padding:5px 8px; max-width:300px; font-size:14px; line-height:1.2; background-color:rgba(255,255,255,0.9); border-radius:6px; box-shadow:0 0 5px rgba(0,0,0,0.3);">' +
-		    '<h4 style="margin:0 0 4px 0; font-size:15px;">Socioeconomic status</h4>' +
-		    (props
-		      ? '<b>' + props.nimi + '</b><br />' +
-		        'Basic education only: <span style="font-weight:bold; color:#000;">' + props.ko_perus + '</span><br />' +
-		        'Median income: <span style="font-weight:bold; color:#000;">' + props.hr_mtu + '</span><br />' +
-		        'Unemployment rate: <span style="font-weight:bold; color:#000;">' + props.Emplyotyme + ' %</span><br />' +
-		        '<b>Overall:</b> ' + getIndicatorLabel(props.indicator)
-		      : 'Hover over an area');
-		};
+  this._div.innerHTML =
+    '<div style="padding:8px 12px; max-width:320px; font-size:14px; line-height:1.6; background-color:rgba(255,255,255,0.9); font-family: Arial, sans-serif;">' +
+      '<h4 style="margin:0 0 8px 0; font-size:16px; font-weight:bold;">Socioeconomic status</h4>' +
+      (props
+        ? '<div style="margin-bottom:4px;"><b>Area:</b> ' + props.nimi + '</div>' +
+          '<div style="margin-bottom:2px;"><b>Basic education only:</b> ' + props.ko_perus + '</div>' +
+          '<div style="margin-bottom:2px;"><b>Median income:</b> ' + props.hr_mtu + '</div>' +
+          '<div style="margin-bottom:2px;"><b>Unemployment rate:</b> ' + props.Emplyotyme + ' %</div>' +
+          '<div><b>Overall:</b> ' + getIndicatorLabel(props.indicator) + '</div>'
+        : '<div>Hover over an area</div>') +
+    '</div>';
+};
 
 		info.addTo(map);
 
@@ -390,7 +389,7 @@
         map.getPane('pane_Buffers_2').style.zIndex = 405;
         map.getPane('pane_Buffers_2').style['mix-blend-mode'] = 'normal';
         var layer_Buffers_2 = new L.geoJson(json_Buffers_2, {
-		    style: { color: '#ff0000', fillOpacity: 0.2, weight: 2 },
+		    style: { color: 'rgba(255,0,0,0.4)', fillOpacity: 0.2, weight: 2 },
 		    onEachFeature: pop_Buffers_2
 		});
 		bounds_group.addLayer(layer_Buffers_2);
@@ -418,15 +417,24 @@
 			layer.bindPopup(content, { maxHeight: 400 });
         }
 		function showBufferAndServices(stop_id) {
-				    const buffer = json_Buffers_2.features.find(f => f.properties.stop_id == stop_id);
-				    if (!buffer) return;
+    const buffer = json_Buffers_2.features.find(f => f.properties.stop_id == stop_id);
+    if (!buffer) return;
 
-				    layer_Buffers_2.clearLayers().addData(buffer).addTo(map);
+    // Päivitä bufferi heti kartalle
+    layer_Buffers_2.clearLayers().addData(buffer).addTo(map);
 
-				    const servicesInBuffer = json_Wellbeingservicesmerged_5.features.filter(f =>
-				        turf.booleanPointInPolygon(f, buffer)
-				    );
-				    layer_Wellbeingservicesmerged_5.clearLayers().addData({ type:'FeatureCollection', features: servicesInBuffer }).addTo(map);
+    // Zoomataan bufferiin ensin
+    map.flyToBounds(layer_Buffers_2.getBounds(), { maxZoom: 14, padding: [20, 20] });
+
+    // Lisää service points vasta zoomauksen jälkeen, jotta ne eivät näytä liian suurilta
+    map.once('zoomend', function() {
+        const servicesInBuffer = json_Wellbeingservicesmerged_5.features.filter(f =>
+            turf.booleanPointInPolygon(f, buffer)
+        );
+        layer_Wellbeingservicesmerged_5.clearLayers()
+            .addData({ type: 'FeatureCollection', features: servicesInBuffer })
+            .addTo(map);
+    });
 }
         function style_Tramline_3_0() {
             return {
@@ -636,9 +644,9 @@
         map.getPane('pane_Wellbeingservicesmerged_5').style.zIndex = 405;
         map.getPane('pane_Wellbeingservicesmerged_5').style['mix-blend-mode'] = 'normal';
 		const categoryColors= {
-		  'Culture services': '#ffa500',
-		  'Schools': '#0000ff',
-		  'Sport & Wellbeing services': '#FF0000'
+		  'Culture services': '#d9822b',
+		  'Schools': '#3366cc',
+		  'Sport & Wellbeing services': '#cc3333'
 		};
         var layer_Wellbeingservicesmerged_5 = new L.geoJson(json_Wellbeingservicesmerged_5,{
 		    pointToLayer: function(feature, latlng) {
@@ -647,7 +655,7 @@
 		            radius: 6,
 		            color: color,
 					fillColor: color,
-		            fillOpacity: 1,
+		            fillOpacity: 0.8,
 					weight: 1
 		        });
 		    },
@@ -758,15 +766,15 @@
         var overlaysTree = [
 		// Add headings to the different layer categories
 			{
-				label: '<span style="font-size:14px;"><b>Heatmaps of wellbeing services</b>',
+				label: '<span style="font-size:16px;"><b>Heatmaps of wellbeing services</b>',
 				children: [
-					{ label: "🏫 Schools", layer: layer_Schools_heatmap_8 },
-					{ label: "🏋️ Sport & wellbeing services", layer: layer_Sport_heatmap_7 },
-					{ label: "🎨 Culture services", layer: layer_Culture_heatmap_6 },
+					{ label: "🔵 Schools", layer: layer_Schools_heatmap_8 },
+					{ label: "🔴 Sport & wellbeing services", layer: layer_Sport_heatmap_7 },
+					{ label: "🟠 Culture services", layer: layer_Culture_heatmap_6 },
 				],
 			},
 			{
-				label:'<span style="font-size:14px;"><b>Socioeconomic status</b>',
+				label:'<span style="font-size:16px;"><b>Socioeconomic status</b>',
 				children: [
 				{
 					label:
